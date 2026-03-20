@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pioneer eMobility — Campaign Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f4f0; color: #1a1a1a; font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 980px; margin: 0 auto; padding: 48px 36px 64px; }
+
+  .header { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; padding-bottom:24px; margin-bottom:32px; border-bottom:2px solid #1D9E75; }
+  .brand { font-size:11px; font-weight:700; color:#1D9E75; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:6px; }
+  .report-title { font-size:28px; font-weight:700; color:#111; letter-spacing:-0.5px; }
+  .report-meta { font-size:12px; color:#999; margin-top:5px; }
+  .header-right { text-align:right; }
+  .prepared-label { font-size:11px; color:#aaa; }
+  .prepared-val { font-size:13px; font-weight:600; color:#444; margin-bottom:4px; }
+
+  .section-label { font-size:10px; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:0.14em; margin-bottom:14px; margin-top:36px; }
+
+  .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .kpi { background:#edecea; border-radius:10px; padding:16px 18px; }
+  .kpi-label { font-size:12px; color:#888; margin-bottom:6px; font-weight:500; }
+  .kpi-value { font-size:30px; font-weight:700; color:#185FA5; line-height:1; }
+  .kpi-sub { font-size:11px; color:#aaa; margin-top:5px; }
+
+  .status-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .status-card { background:#fff; border-radius:10px; padding:16px 18px; border:1px solid #e8e5dc; }
+  .status-card.highlight { border:2px solid #1D9E75; }
+  .status-label { font-size:11px; color:#999; margin-bottom:6px; font-weight:500; }
+  .status-value { font-size:28px; font-weight:700; line-height:1; }
+  .status-desc { font-size:10px; color:#bbb; margin-top:5px; }
+
+  .card { background:#fff; border:1px solid #e8e5dc; border-radius:12px; padding:20px 24px; margin-top:14px; }
+  .card-title { font-size:13px; font-weight:600; color:#222; margin-bottom:16px; }
+
+  .legend { display:flex; gap:14px; flex-wrap:wrap; font-size:11px; color:#888; margin-bottom:14px; font-weight:500; }
+  .legend-dot { width:10px; height:10px; border-radius:3px; display:inline-block; margin-right:4px; vertical-align:middle; }
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+  .stat-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f0ede5; font-size:13px; }
+  .stat-row:last-child { border-bottom:none; }
+  .stat-key { color:#999; font-weight:400; }
+  .stat-val { font-weight:600; color:#222; }
+  .stat-val-blue { font-weight:600; color:#185FA5; }
+
+  .table-card { background:#fff; border:1px solid #e8e5dc; border-radius:12px; margin-top:14px; overflow:hidden; }
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; min-width:1100px; border-collapse:collapse; font-size:12px; }
+  thead th { text-align:center; padding:10px 6px; font-weight:600; font-size:10px; color:#aaa; border-bottom:1.5px solid #ede9df; background:#faf8f4; white-space:nowrap; letter-spacing:0.03em; }
+  thead th:first-child { text-align:left; padding-left:20px; }
+  thead th:last-child { text-align:left; }
+  tbody tr { border-bottom:1px solid #f0ede5; }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:nth-child(even) td { background:#faf8f4; }
+  tbody td { padding:9px 6px; text-align:center; vertical-align:top; color:#333; }
+  tbody td:first-child { text-align:left; font-weight:600; white-space:nowrap; font-size:12px; padding-left:20px; color:#222; }
+  tbody td:last-child { text-align:left; padding-right:16px; }
+  .total-row td { font-weight:700; border-top:2px solid #dedad0; background:#f0ede5 !important; color:#333; }
+  .company-list { color:#999; font-size:11px; line-height:1.9; font-weight:400; }
+
+  .pill { display:inline-block; padding:3px 9px; border-radius:20px; font-size:10px; font-weight:700; letter-spacing:0.02em; }
+  .p-booked { background:#1D9E75; color:#fff; box-shadow:0 0 0 1.5px #0F6E56; }
+  .p-sql    { background:#5DCAA5; color:#fff; }
+  .p-coord  { background:#9FE1CB; color:#0F6E56; }
+  .p-int    { background:#378ADD; color:#fff; }
+  .p-info   { background:#85B7EB; color:#0C447C; }
+  .p-qual   { background:#B5D4F4; color:#0C447C; }
+  .p-ref    { background:#CECBF6; color:#3C3489; }
+  .p-resch  { background:#D3D1C7; color:#555; }
+  .p-mql    { background:#e8e5dc; color:#888; }
+  .zero     { color:#ddd; font-size:12px; }
+
+  .footer { margin-top:52px; padding-top:20px; border-top:1px solid #e8e5dc; display:flex; justify-content:space-between; font-size:11px; color:#ccc; font-weight:500; }
+
+  @media (max-width:720px) {
+    .kpi-grid, .status-grid { grid-template-columns:repeat(2,1fr); }
+    .two-col { grid-template-columns:1fr; }
+    .header { flex-direction:column; align-items:flex-start; }
+    .header-right { text-align:left; }
+    .page { padding:28px 20px 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div>
+      <div class="brand">Pioneer eMobility</div>
+      <div class="report-title">Campaign performance report</div>
+      <div class="report-meta">September 2, 2025 – March 19, 2026 &nbsp;·&nbsp; Requested by Scott Bradley</div>
+    </div>
+    <div class="header-right">
+      <div class="prepared-label">Prepared by</div>
+      <div class="prepared-val">Cesar</div>
+      <div class="prepared-label">Date</div>
+      <div class="prepared-val">March 19, 2026</div>
+    </div>
+  </div>
+
+  <div class="section-label">Campaign totals since launch</div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Total dials made</div><div class="kpi-value">12,305</div><div class="kpi-sub">494 live connections · 3.53% rate</div></div>
+    <div class="kpi"><div class="kpi-label">Total emails sent</div><div class="kpi-value">61,292</div><div class="kpi-sub">20,880 leads contacted</div></div>
+    <div class="kpi"><div class="kpi-label">Opportunities reached</div><div class="kpi-value">88</div><div class="kpi-sub">69 unique companies · 22 weeks</div></div>
+    <div class="kpi"><div class="kpi-label">Positive reply rate</div><div class="kpi-value">8.6%</div><div class="kpi-sub">22 positive email replies</div></div>
+  </div>
+
+  <div class="section-label">Lead outcome breakdown</div>
+  <div class="status-grid">
+    <div class="status-card highlight"><div class="status-label">Meetings booked</div><div class="status-value" style="color:#1D9E75;">17</div><div class="status-desc">Confirmed on calendar</div></div>
+    <div class="status-card"><div class="status-label">SQL — sales qualified</div><div class="status-value" style="color:#5DCAA5;">1</div><div class="status-desc">Engaged via email or prior contact</div></div>
+    <div class="status-card"><div class="status-label">Coordinating</div><div class="status-value" style="color:#9FE1CB;">5</div><div class="status-desc">Meeting times sent, hot leads</div></div>
+    <div class="status-card"><div class="status-label">Interested</div><div class="status-value" style="color:#378ADD;">1</div><div class="status-desc">Expressed clear interest</div></div>
+    <div class="status-card"><div class="status-label">Info request</div><div class="status-value" style="color:#85B7EB;">7</div><div class="status-desc">Requested more information</div></div>
+    <div class="status-card"><div class="status-label">Qualifying</div><div class="status-value" style="color:#B5D4F4;">6</div><div class="status-desc">Warm, clarifying fit</div></div>
+    <div class="status-card"><div class="status-label">Referral / internal fwd</div><div class="status-value" style="color:#CECBF6;">19</div><div class="status-desc">Forwarded to right contact</div></div>
+    <div class="status-card"><div class="status-label">Rescheduling</div><div class="status-value" style="color:#aaa;">4</div><div class="status-desc">Meeting missed, re-booking</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pipeline momentum — opportunities reached & outcomes by week</div>
+    <div class="legend">
+      <span><span class="legend-dot" style="background:rgba(24,95,165,0.15);border:1px solid #185FA5;"></span>Total reached</span>
+      <span><span class="legend-dot" style="background:#1D9E75;"></span>Booked</span>
+      <span><span class="legend-dot" style="background:#5DCAA5;"></span>SQL</span>
+      <span><span class="legend-dot" style="background:#9FE1CB;border:1px solid #bbb;"></span>Coordinating</span>
+      <span><span class="legend-dot" style="background:#378ADD;"></span>Interested</span>
+      <span><span class="legend-dot" style="background:#85B7EB;"></span>Info request</span>
+      <span><span class="legend-dot" style="background:#B5D4F4;border:1px solid #bbb;"></span>Qualifying</span>
+    </div>
+    <div style="position:relative;width:100%;height:240px;"><canvas id="weeklyChart"></canvas></div>
+  </div>
+
+  <div class="section-label" style="margin-top:36px;">Weekly breakdown by lead outcome</div>
+  <div class="table-card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Week</th><th>Reached</th>
+            <th><span class="pill p-booked">Booked</span></th>
+            <th><span class="pill p-sql">SQL</span></th>
+            <th><span class="pill p-coord">Coord.</span></th>
+            <th><span class="pill p-int">Interest.</span></th>
+            <th><span class="pill p-info">Info req.</span></th>
+            <th><span class="pill p-qual">Qualifying</span></th>
+            <th><span class="pill p-ref">Referral</span></th>
+            <th><span class="pill p-resch">Resch.</span></th>
+            <th><span class="pill p-mql">MQL</span></th>
+            <th>Companies contacted</th>
+          </tr>
+        </thead>
+        <tbody id="weekTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:36px;">Channel performance</div>
+  <div class="two-col">
+    <div class="card" style="margin-top:0;">
+      <div class="card-title">Calling</div>
+      <div class="stat-row"><span class="stat-key">Total outbound dials</span><span class="stat-val">12,305</span></div>
+      <div class="stat-row"><span class="stat-key">Connected (any outcome)</span><span class="stat-val">10,504</span></div>
+      <div class="stat-row"><span class="stat-key">Live human connections</span><span class="stat-val-blue">494</span></div>
+      <div class="stat-row"><span class="stat-key">Voicemail / machine</span><span class="stat-val">9,932</span></div>
+      <div class="stat-row"><span class="stat-key">No answer</span><span class="stat-val">1,227</span></div>
+      <div class="stat-row"><span class="stat-key">Busy / failed</span><span class="stat-val">574</span></div>
+      <div class="stat-row"><span class="stat-key">Connection rate</span><span class="stat-val-blue">3.53%</span></div>
+    </div>
+    <div class="card" style="margin-top:0;">
+      <div class="card-title">Email</div>
+      <div class="stat-row"><span class="stat-key">Total emails sent</span><span class="stat-val">61,292</span></div>
+      <div class="stat-row"><span class="stat-key">Leads contacted</span><span class="stat-val">20,880</span></div>
+      <div class="stat-row"><span class="stat-key">Completed leads</span><span class="stat-val">18,186</span></div>
+      <div class="stat-row"><span class="stat-key">Reply rate</span><span class="stat-val-blue">1.2% (257)</span></div>
+      <div class="stat-row"><span class="stat-key">Positive reply rate</span><span class="stat-val-blue">8.6% (22)</span></div>
+      <div class="stat-row"><span class="stat-key">Reply rate (incl. OOO)</span><span class="stat-val">2.9% (600)</span></div>
+      <div class="stat-row"><span class="stat-key">Bounce rate</span><span class="stat-val">0.6% (365)</span></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Pioneer eMobility · Campaign Report · Sep 2025 – Mar 2026</span>
+    <span>Prepared by Cesar · Existantly · March 19, 2026</span>
+  </div>
+
+</div>
+<script>
+const data=[
+  {week:"Sep 1–7",  total:3, booked:0,sql:0,coord:0,interested:0,info:0,qual:0,ref:0,resch:0,mql:3, companies:["City of Annapolis, MD","Georgetown Preparatory School","YWCA Madison"]},
+  {week:"Sep 8–14", total:9, booked:1,sql:0,coord:0,interested:0,info:0,qual:0,ref:2,resch:1,mql:5, companies:["calstart","City of Asheville","Parker","Richfield Public Schools","RIVERTON CUSD 14","The Athenian School","William Penn Charter School"]},
+  {week:"Sep 15–21",total:10,booked:1,sql:0,coord:0,interested:0,info:0,qual:1,ref:3,resch:2,mql:3, companies:["AECOM","Dot-Line Transportation","Empire Real Estate & Development","Garcia Stromberg","Monte Vista School District","Primo Brands","Zūm"]},
+  {week:"Sep 22–28",total:4, booked:1,sql:0,coord:0,interested:0,info:1,qual:0,ref:0,resch:0,mql:2, companies:["Coast Unified School District","Dublin Unified School District","Hardy Family Automotive Group","PepsiCo"]},
+  {week:"Sep 29–Oct 5",total:5,booked:1,sql:0,coord:1,interested:0,info:0,qual:0,ref:1,resch:0,mql:2,companies:["Antelope Valley Schools Transportation Agency","Leidos","Malone Central School District","Urban Alchemy"]},
+  {week:"Oct 6–12", total:4, booked:0,sql:0,coord:0,interested:0,info:1,qual:0,ref:1,resch:0,mql:2, companies:["DATTCO","Navistar Inc","Student Transportation of America"]},
+  {week:"Oct 13–19",total:1, booked:1,sql:0,coord:0,interested:0,info:0,qual:0,ref:0,resch:0,mql:0, companies:["Ithaca City School District"]},
+  {week:"Oct 20–26",total:4, booked:2,sql:0,coord:0,interested:0,info:0,qual:0,ref:2,resch:0,mql:0, companies:["A-Z Bus Sales, Inc","First Student"]},
+  {week:"Oct 27–Nov 2",total:4,booked:0,sql:0,coord:0,interested:0,info:0,qual:1,ref:1,resch:0,mql:2,companies:["Baltimore City Public Schools","LAPD Motor Transport Division","Snowline Schools"]},
+  {week:"Nov 3–9",  total:3, booked:1,sql:0,coord:0,interested:0,info:1,qual:0,ref:0,resch:0,mql:1, companies:["Casa Grande Elementary School District","Student Transportation of America","Sunwater Marine"]},
+  {week:"Nov 10–16",total:2, booked:2,sql:0,coord:0,interested:0,info:0,qual:0,ref:0,resch:0,mql:0, companies:["Beacon Mobility","Natomas Unified School District"]},
+  {week:"Nov 24–30",total:1, booked:0,sql:0,coord:0,interested:0,info:0,qual:0,ref:0,resch:0,mql:1, companies:["Anaheim School District"]},
+  {week:"Dec 1–7",  total:11,booked:1,sql:1,coord:0,interested:0,info:1,qual:1,ref:4,resch:0,mql:0, companies:["Fairfax County PS (1,2,7)","Fairfax County PS (3,4)","First Student","Highland Electric Fleets","Houston ISD","Madison Metropolitan SD","World Resources Institute"]},
+  {week:"Dec 8–14", total:4, booked:0,sql:0,coord:0,interested:0,info:0,qual:0,ref:1,resch:0,mql:3, companies:["Cypress-Fairbanks ISD","Mt. Healthy City Schools","Rocklin Unified School District"]},
+  {week:"Dec 15–21",total:4, booked:0,sql:0,coord:2,interested:0,info:0,qual:0,ref:1,resch:1,mql:0, companies:["GreenPower Motor Company","Memphis-Shelby County Schools","Prince George's County Public Schools","Victor Valley Union High School District"]},
+  {week:"Jan 12–18",total:4, booked:0,sql:0,coord:1,interested:1,info:0,qual:0,ref:2,resch:0,mql:0, companies:["Gilroy Unified School District","Student Transportation of America","Twin Rivers Unified School District"]},
+  {week:"Jan 19–25",total:2, booked:1,sql:0,coord:1,interested:0,info:0,qual:0,ref:0,resch:0,mql:0, companies:["Lynchburg City Schools","Madison County Schools"]},
+  {week:"Feb 2–8",  total:5, booked:2,sql:0,coord:0,interested:0,info:0,qual:1,ref:1,resch:0,mql:1, companies:["Affton School District","Carmel Clay Schools","NorthStar Bus Lines","Osseo Area Schools","Public Schools of the Tarrytowns"]},
+  {week:"Feb 9–15", total:3, booked:0,sql:0,coord:0,interested:0,info:2,qual:1,ref:0,resch:0,mql:0, companies:["Ann Arbor Public Schools","Hemet Unified School District","Loudoun County Public Schools"]},
+  {week:"Feb 16–22",total:1, booked:1,sql:0,coord:0,interested:0,info:0,qual:0,ref:0,resch:0,mql:0, companies:["Red Clay Consolidated School District"]},
+  {week:"Mar 2–8",  total:1, booked:1,sql:0,coord:0,interested:0,info:0,qual:0,ref:0,resch:0,mql:0, companies:["Richland School District 2"]},
+  {week:"Mar 16–19",total:3, booked:1,sql:0,coord:0,interested:0,info:1,qual:1,ref:0,resch:0,mql:0, companies:["Houston ISD","Oceanside Unified School District","Robert's Hawaii"]}
+];
+new Chart(document.getElementById('weeklyChart'),{type:'bar',data:{labels:data.map(d=>d.week),datasets:[
+  {label:'Total reached',data:data.map(d=>d.total),backgroundColor:'rgba(24,95,165,0.08)',borderColor:'rgba(24,95,165,0.2)',borderWidth:1,borderRadius:3,barPercentage:0.7},
+  {label:'Booked',data:data.map(d=>d.booked),backgroundColor:'#1D9E75',borderRadius:3,barPercentage:0.7},
+  {label:'SQL',data:data.map(d=>d.sql),backgroundColor:'#5DCAA5',borderRadius:3,barPercentage:0.7},
+  {label:'Coordinating',data:data.map(d=>d.coord),backgroundColor:'#9FE1CB',borderRadius:3,barPercentage:0.7},
+  {label:'Interested',data:data.map(d=>d.interested),backgroundColor:'#378ADD',borderRadius:3,barPercentage:0.7},
+  {label:'Info request',data:data.map(d=>d.info),backgroundColor:'#85B7EB',borderRadius:3,barPercentage:0.7},
+  {label:'Qualifying',data:data.map(d=>d.qual),backgroundColor:'#B5D4F4',borderRadius:3,barPercentage:0.7},
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#bbb',font:{size:9,family:'Inter'},maxRotation:50,autoSkip:false}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#bbb',font:{size:11,family:'Inter'},stepSize:1}}}}});
+function c(v,cl){return v>0?`<span class="pill ${cl}">${v}</span>`:`<span class="zero">—</span>`;}
+const tb=document.getElementById('weekTable');
+let tt=0,tbo=0,ts=0,tc=0,ti=0,tif=0,tq=0,tr=0,tre=0,tm=0;
+data.forEach(d=>{
+  tt+=d.total;tbo+=d.booked;ts+=d.sql;tc+=d.coord;ti+=d.interested;tif+=d.info;tq+=d.qual;tr+=d.ref;tre+=d.resch;tm+=d.mql;
+  const r=document.createElement('tr');
+  r.innerHTML=`<td>Week of ${d.week}</td><td>${d.total}</td><td>${c(d.booked,'p-booked')}</td><td>${c(d.sql,'p-sql')}</td><td>${c(d.coord,'p-coord')}</td><td>${c(d.interested,'p-int')}</td><td>${c(d.info,'p-info')}</td><td>${c(d.qual,'p-qual')}</td><td>${c(d.ref,'p-ref')}</td><td>${c(d.resch,'p-resch')}</td><td>${c(d.mql,'p-mql')}</td><td class="company-list">${d.companies.map(function(n){return '– '+n;}).join('<br>')}</td>`;
+  tb.appendChild(r);
+});
+const tot=document.createElement('tr');
+tot.className='total-row';
+tot.innerHTML=`<td>Total</td><td>${tt}</td><td>${tbo}</td><td>${ts}</td><td>${tc}</td><td>${ti}</td><td>${tif}</td><td>${tq}</td><td>${tr}</td><td>${tre}</td><td>${tm}</td><td class="company-list" style="color:#bbb;">69 unique companies · 22 active weeks</td>`;
+tb.appendChild(tot);
+</script>
+</body>
+</html>
